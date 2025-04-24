@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Expectativas</title>
+  <style>
+    body { font-family: sans-serif; max-width: 600px; margin: 30px auto; background: #f9f9f9; padding: 20px; }
+    input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    #comentarios p { background: #fff; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Comparte tu expectativa</h1>
+  <input type="text" id="nombre" placeholder="Tu nombre" required>
+  <input type="text" id="expectativa" placeholder="Tu expectativa" required>
+  <button onclick="guardar()">Guardar</button>
+
+  <h2>Comentarios</h2>
+  <div id="comentarios"></div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/library/d/1ne_9Ep8bWKZnF2gtCpZk4bpMlsSGmy0-9rRxmMSsMVKTkfW4ozNxpmxa/1";
+
+    async function guardar() {
+      const nombre = document.getElementById("nombre").value;
+      const expectativa = document.getElementById("expectativa").value;
+
+      if (!nombre || !expectativa) return alert("Completa ambos campos");
+
+      await fetch(API_URL, {
+        method: "POST",
+        body: JSON.stringify({ nombre, expectativa }),
+        headers: { "Content-Type": "application/json" }
+      });
+
+      document.getElementById("nombre").value = "";
+      document.getElementById("expectativa").value = "";
+      cargarComentarios();
+    }
+
+    async function cargarComentarios() {
+      const res = await fetch(API_URL);
+      const data = await res.json();
+
+      const div = document.getElementById("comentarios");
+      div.innerHTML = "";
+      data.reverse().forEach(item => {
+        div.innerHTML += `<p><strong>${item.nombre}:</strong> ${item.expectativa}</p>`;
+      });
+    }
+
+    cargarComentarios();
+  </script>
+</body>
+</html>
+
+
