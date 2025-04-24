@@ -4,9 +4,24 @@
   <meta charset="UTF-8">
   <title>Expectativas</title>
   <style>
-    body { font-family: sans-serif; max-width: 600px; margin: 30px auto; background: #f9f9f9; padding: 20px; }
-    input, button { width: 100%; padding: 10px; margin-top: 10px; }
-    #comentarios p { background: #fff; padding: 10px; border-radius: 5px; margin-bottom: 10px; }
+    body {
+      font-family: sans-serif;
+      max-width: 600px;
+      margin: 30px auto;
+      background: #f9f9f9;
+      padding: 20px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+    }
+    #comentarios p {
+      background: #fff;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
   </style>
 </head>
 <body>
@@ -16,21 +31,27 @@
   <button onclick="guardar()">Guardar</button>
 
   <h2>Comentarios</h2>
-  <div id="comentarios"></div>
+  <div id="comentarios">Cargando...</div>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbzlHsiw1JgbiaTi07b9SyPFyZIp5hgNhd_5KyMiK7rJQfCjoW5KEA1NQTTJK5LicQw9/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbzs93ini_c0vkBYCLqh_Lkm3rqyBARK9z5JFf35fcmEy4J6DdOUirx29Yw8tnffNUp1/exec"; // <-- Reemplaza con tu URL
 
     async function guardar() {
       const nombre = document.getElementById("nombre").value;
       const expectativa = document.getElementById("expectativa").value;
 
-      if (!nombre || !expectativa) return alert("Completa ambos campos");
+      if (!nombre || !expectativa) {
+        alert("Por favor completa ambos campos.");
+        return;
+      }
+
+      const form = new FormData();
+      form.append("nombre", nombre);
+      form.append("expectativa", expectativa);
 
       await fetch(API_URL, {
         method: "POST",
-        body: JSON.stringify({ nombre, expectativa }),
-        headers: { "Content-Type": "application/json" }
+        body: form
       });
 
       document.getElementById("nombre").value = "";
@@ -39,19 +60,22 @@
     }
 
     async function cargarComentarios() {
-      const res = await fetch(API_URL);
-      const data = await res.json();
+      try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
 
-      const div = document.getElementById("comentarios");
-      div.innerHTML = "";
-      data.reverse().forEach(item => {
-        div.innerHTML += `<p><strong>${item.nombre}:</strong> ${item.expectativa}</p>`;
-      });
+        const div = document.getElementById("comentarios");
+        div.innerHTML = "";
+
+        data.reverse().forEach(item => {
+          div.innerHTML += `<p><strong>${item.nombre}:</strong> ${item.expectativa}</p>`;
+        });
+      } catch (err) {
+        document.getElementById("comentarios").innerText = "No se pudieron cargar los comentarios.";
+      }
     }
 
     cargarComentarios();
   </script>
 </body>
 </html>
-
-
